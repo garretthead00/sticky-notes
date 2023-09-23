@@ -3,7 +3,7 @@ import "./styles.scss";
 
 const StickyNote = (props) => {
   const { note } = props;
-  let clientX, clientY, currentSelectedNote, parent;
+  let clientX, clientY, currentSelectedNote;
 
   const deleteNote = (note) => {
     props.deleteNote(note);
@@ -18,25 +18,48 @@ const StickyNote = (props) => {
     event.stopPropagation();
     event.preventDefault();
     currentSelectedNote = document.getElementById(`note_${note.id}`);
-    var arrowRects = currentSelectedNote.getBoundingClientRect();
+    let arrowRects = currentSelectedNote.getBoundingClientRect();
     clientX = arrowRects.left + arrowRects.width / 2;
     clientY = arrowRects.top + arrowRects.height / 2;
     window.addEventListener("mousemove", rotateStart, false);
     window.addEventListener("mouseup", rotateStop, false);
   };
 
-  function rotateStart(e) {
-    var radians = Math.atan2(e.clientY - clientY, e.clientX - clientX);
-    var deg = radians * (180 / Math.PI) + 20;
+  function rotateStart(event) {
+    let radians = Math.atan2(event.clientY - clientY, event.clientX - clientX);
+    let deg = radians * (180 / Math.PI) + 20;
     currentSelectedNote.style.transform = "rotate(" + deg + "deg)";
   }
 
-  function rotateStop(e) {
+  function rotateStop(event, note) {
     currentSelectedNote = null;
     clientX = 0;
     clientY = 0;
     window.removeEventListener("mousemove", rotateStart, false);
     window.removeEventListener("mouseup", rotateStop, false);
+  }
+
+  function resizeNote(event) {
+    console.log("rotating note", note);
+    event.stopPropagation();
+    event.preventDefault();
+    currentSelectedNote = document.getElementById(`note_${note.id}`);
+    window.addEventListener("mousemove", resizeStart, false);
+    window.addEventListener("mouseup", resizeStop, false);
+  }
+
+  function resizeStart(event) {
+    const diffX = event.clientX - currentSelectedNote.offsetLeft;
+    const diffY = event.clientY - currentSelectedNote.offsetTop;
+    const newSize = diffX < diffY ? diffX : diffY;
+    currentSelectedNote.style.width = newSize + "px";
+    currentSelectedNote.style.height = newSize + "px";
+  }
+
+  function resizeStop(event) {
+    currentSelectedNote = null;
+    window.removeEventListener("mousemove", resizeStart, false);
+    window.removeEventListener("mouseup", resizeStop, false);
   }
 
   return (
@@ -78,6 +101,10 @@ const StickyNote = (props) => {
           />
         </svg>
       </div>
+      <div
+        className="resize-note"
+        onMouseDown={(event) => resizeNote(event, note)}
+      ></div>
       <pre className="text">{note.text}</pre>
     </div>
   );

@@ -1,41 +1,55 @@
 .note {
+  position: absolute;
+  cursor: pointer;
+  background-color: yellow;
+  top: 100px;
+  left: 300px;
+  min-height: 64px;
+  min-width: 64px;
+  max-height: 248px;
+  max-width: 248px;
+  height: 64px;
+  width: 64px;
+  padding: 20px;
+
+  .close-note {
+    width: 15px;
+    height: 15px;
     position: absolute;
-    cursor: pointer;
-    background-color: yellow;
-    top: 100px;
-    left: 300px;
-    height: 64px;
-    width: 64px;
-    padding: 20px;
-  
-    .close-note {
-      width: 15px;
-      height: 15px;
-      position: absolute;
-      right: 5px;
-      top: 5px;
-      transition: transform 0.3s ease;
-  
-      &:hover {
-        transform: scale(1.6);
-      }
-    }
-  
-    .rotate-note {
-      width: 15px;
-      height: 15px;
-      position: absolute;
-      right: -15px;
-      top: -15px;
-      transition: transform 0.3s ease;
-  
-      svg {
-        display: none;
-      }
-  
-      &:hover svg {
-        display: block;
-        transform: scale(1.6);
-      }
+    right: 5px;
+    top: 5px;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.6);
     }
   }
+
+  .rotate-note {
+    width: 15px;
+    height: 15px;
+    position: absolute;
+    right: -15px;
+    top: -15px;
+    transition: transform 0.3s ease;
+
+    svg {
+      display: none;
+    }
+
+    &:hover svg {
+      display: block;
+      transform: scale(1.6);
+    }
+  }
+
+  .resize-note {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: red;
+    right: -5px;
+    bottom: -5px;
+    cursor: se-resize;
+  }
+}
