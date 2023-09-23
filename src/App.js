@@ -51,7 +51,7 @@ function App() {
       text: noteInput,
       rotate: Math.floor(Math.random() * 20),
     };
-
+    setNoteInput("");
     dispatch({ type: "ADD_NOTE", payload: newNote });
   };
 
@@ -73,7 +73,6 @@ function App() {
       <div
         className="canvas"
         onDragOver={dragOver}
-        style={{ height: "500px", border: `1px solid red` }}
       >
         <form className="note-form" onSubmit={addNote}>
           <textarea
