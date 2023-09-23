@@ -1,11 +1,8 @@
 import React from "react";
-
-// Styles
 import "./App.scss";
 
 // Components
 import Canvas from "./components/Canvas";
-
 
 function App() {
   return (

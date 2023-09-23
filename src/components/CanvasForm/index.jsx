@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { v4 as uuid } from "uuid";
-
-import './styles.scss';
+import "./styles.scss";
 
 const CanvasForm = (props) => {
   const [noteInput, setNoteInput] = useState("");

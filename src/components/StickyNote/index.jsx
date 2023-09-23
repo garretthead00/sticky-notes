@@ -1,5 +1,5 @@
 import React from "react";
-import './styles.scss';
+import "./styles.scss";
 
 const StickyNote = (props) => {
   const { note } = props;
@@ -19,10 +19,7 @@ const StickyNote = (props) => {
       draggable="true"
       onDragEnd={dropNote}
     >
-      <div
-        className="close-note"
-        onClick={() => deleteNote(note)}
-      >
+      <div className="close-note" onClick={() => deleteNote(note)}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
