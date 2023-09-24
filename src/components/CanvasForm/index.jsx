@@ -8,9 +8,6 @@ const CanvasForm = (props) => {
   const addNote = (event) => {
     event.preventDefault();
 
-    if (!noteInput) {
-      return;
-    }
     const newNote = {
       id: uuid(),
       text: noteInput,

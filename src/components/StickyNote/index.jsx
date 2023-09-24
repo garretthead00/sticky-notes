@@ -1,9 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./styles.scss";
 
 const StickyNote = (props) => {
-  const { note } = props;
+  const { note, isSelected } = props;
+  const [currentNote, setCurrentNote] = useState({});
   let clientX, clientY, currentSelectedNote;
+
+  useEffect(() => {
+    setCurrentNote(note);
+  }, []);
+
+  useEffect(() => {
+    setCurrentNote(note);
+  }, [props.note]);
 
   const deleteNote = (note) => {
     props.deleteNote(note);
@@ -13,11 +22,40 @@ const StickyNote = (props) => {
     props.dropNote(event);
   };
 
-  const rotateNote = (event, note) => {
-    console.log("rotating note", note);
+  const selectNote = (event, note) => {
     event.stopPropagation();
     event.preventDefault();
-    currentSelectedNote = document.getElementById(`note_${note.id}`);
+    props.selectNote(note);
+  };
+
+  function resizeNote(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    currentSelectedNote = document.getElementById(`note_${currentNote.id}`);
+    window.addEventListener("mousemove", resizeStart, false);
+    window.addEventListener("mouseup", resizeStop, false);
+  }
+
+  function resizeStart(event) {
+    const noteText = document.getElementById(`note_text_${currentNote.id}`);
+    const diffX = event.clientX - currentSelectedNote.offsetLeft;
+    const diffY = event.clientY - currentSelectedNote.offsetTop;
+    const newSize = diffX < diffY ? diffX : diffY;
+    currentSelectedNote.style.width = newSize + "px";
+    currentSelectedNote.style.height = newSize + "px";
+    noteText.style.fontSize = `clamp(16px, ${newSize / 4}px, 64px)`;
+  }
+
+  function resizeStop(event) {
+    currentSelectedNote = null;
+    window.removeEventListener("mousemove", resizeStart, false);
+    window.removeEventListener("mouseup", resizeStop, false);
+  }
+
+  const rotateNote = (event, note) => {
+    event.stopPropagation();
+    event.preventDefault();
+    currentSelectedNote = document.getElementById(`note_${currentNote.id}`);
     let arrowRects = currentSelectedNote.getBoundingClientRect();
     clientX = arrowRects.left + arrowRects.width / 2;
     clientY = arrowRects.top + arrowRects.height / 2;
@@ -39,38 +77,31 @@ const StickyNote = (props) => {
     window.removeEventListener("mouseup", rotateStop, false);
   }
 
-  function resizeNote(event) {
-    console.log("rotating note", note);
-    event.stopPropagation();
+  function updateNote(event) {
     event.preventDefault();
-    currentSelectedNote = document.getElementById(`note_${note.id}`);
-    window.addEventListener("mousemove", resizeStart, false);
-    window.addEventListener("mouseup", resizeStop, false);
+    event.stopPropagation();
+
+    const newNote = {
+      ...currentNote,
+      text: event.target.value,
+    };
+    setCurrentNote(newNote);
   }
 
-  function resizeStart(event) {
-    const diffX = event.clientX - currentSelectedNote.offsetLeft;
-    const diffY = event.clientY - currentSelectedNote.offsetTop;
-    const newSize = diffX < diffY ? diffX : diffY;
-    currentSelectedNote.style.width = newSize + "px";
-    currentSelectedNote.style.height = newSize + "px";
-  }
-
-  function resizeStop(event) {
-    currentSelectedNote = null;
-    window.removeEventListener("mousemove", resizeStart, false);
-    window.removeEventListener("mouseup", resizeStop, false);
+  function updateStop() {
+    props.updateNote(currentNote);
   }
 
   return (
     <div
-      id={`note_${note.id}`}
-      className="note"
-      style={{ transform: `rotate(${note.rotate}deg)` }}
+      id={`note_${currentNote.id}`}
+      className={`note ${isSelected ? "note-selected" : ""}`}
+      style={{ transform: `rotate(${currentNote.rotate}deg)` }}
       draggable="true"
       onDragEnd={dropNote}
+      onClick={(event) => selectNote(event, currentNote)}
     >
-      <div className="close-note" onClick={() => deleteNote(note)}>
+      <div className="close-note" onClick={() => deleteNote(currentNote)}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
@@ -86,7 +117,7 @@ const StickyNote = (props) => {
       </div>
       <div
         className="rotate-note"
-        onMouseDown={(event) => rotateNote(event, note)}
+        onMouseDown={(event) => rotateNote(event, currentNote)}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -103,9 +134,17 @@ const StickyNote = (props) => {
       </div>
       <div
         className="resize-note"
-        onMouseDown={(event) => resizeNote(event, note)}
+        onMouseDown={(event) => resizeNote(event, currentNote)}
       ></div>
-      <pre className="text">{note.text}</pre>
+
+      <textarea
+        id={`note_text_${currentNote.id}`}
+        placeholder=""
+        value={currentNote.text}
+        onChange={(event) => updateNote(event)}
+        onBlur={() => updateStop()}
+        autoFocus
+      ></textarea>
     </div>
   );
 };

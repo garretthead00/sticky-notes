@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useState } from "react";
 import "./styles.scss";
 
 // COMPONENTS
@@ -16,6 +16,7 @@ const initialNoteState = {
 
 const Canvas = () => {
   const [notesState, dispatch] = useReducer(notesReducer, initialNoteState);
+  const [selectedNote, setSelectedNote] = useState();
 
   const addNote = (note) => {
     dispatch({ type: "ADD_NOTE", payload: note });
@@ -23,6 +24,14 @@ const Canvas = () => {
   const deleteNote = (note) => {
     dispatch({ type: "DELETE_NOTE", payload: note });
   };
+  const updateNote = (note) => {
+    dispatch({ type: "UPDATE_NOTE", payload: note });
+  }
+
+  const selectNote = (note) => {
+    setSelectedNote(note);
+    console.log(`selected note with id: ${note.id}`);
+  }
 
   const dropNote = (event) => {
     event.target.style.top = `${event.pageY - 50}px`;
@@ -35,7 +44,7 @@ const Canvas = () => {
   };
 
   return (
-    <div className="canvas" onDragOver={dragOver}>
+    <div className="canvas" onDragOver={dragOver} onClick={() => setSelectedNote()}>
       <CanvasForm addNote={addNote} />
       {notesState.notes.map((note) => (
         <StickyNote
@@ -43,6 +52,9 @@ const Canvas = () => {
           note={note}
           dropNote={dropNote}
           deleteNote={deleteNote}
+          selectNote={selectNote}
+          updateNote={updateNote}
+          isSelected={note?.id === selectedNote?.id}
         />
       ))}
     </div>
