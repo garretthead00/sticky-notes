@@ -25,6 +25,8 @@ const StickyNote = (props) => {
   const selectNote = (event, note) => {
     event.stopPropagation();
     event.preventDefault();
+    const divTextEl = document.getElementById(`note_text_${currentNote.id}`);
+    divTextEl.focus();
     props.selectNote(note);
   };
 
@@ -43,7 +45,9 @@ const StickyNote = (props) => {
     const newSize = diffX < diffY ? diffX : diffY;
     currentSelectedNote.style.width = newSize + "px";
     currentSelectedNote.style.height = newSize + "px";
-    noteText.style.fontSize = `clamp(16px, ${newSize / 4}px, 64px)`;
+
+    //console.log(`noteWidth: ${currentSelectedNote.clientWidth}; noteWidth: ${currentSelectedNote.clientWidth} newSize ${newSize}`);
+    //noteText.style.fontSize = `clamp(16px, ${newSize / 4}px, 64px)`;
   }
 
   function resizeStop(event) {
@@ -86,11 +90,69 @@ const StickyNote = (props) => {
       text: event.target.value,
     };
     setCurrentNote(newNote);
-  }
-
-  function updateStop() {
     props.updateNote(currentNote);
   }
+
+  const updateNoteText = (event) => {
+    const noteEl = document.getElementById(`note_${currentNote.id}`);
+    const divTextEl = document.getElementById(`note_text_${currentNote.id}`);
+    const fontSize = parseInt(window.getComputedStyle(divTextEl).fontSize, 10);
+
+    console.log(
+      `note w x h: | ${noteEl.clientWidth} x ${noteEl.clientHeight} |`
+    );
+    console.log(
+      `textarea w x h: | ${divTextEl.clientWidth} x ${divTextEl.clientHeight} | => fontSize: ${fontSize}`
+    );
+
+    // Default & Reset font sizing
+    if (divTextEl.textContent === "") {
+      console.log("empty content; reset font");
+      divTextEl.style.fontSize = "24px";
+    } else {
+      // DELETE or BACKSPACE
+      if (event.keyCode === 8 || event.keyCode === 46) {
+        if (divTextEl.clientWidth <= noteEl.clientWidth - 24) {
+          divTextEl.style.fontSize = `${
+            fontSize < 1 ? fontSize + 0.1 : fontSize + 1
+          }px`;
+        }
+        if (divTextEl.clientHeight <= noteEl.clientHeight - 24) {
+          divTextEl.style.fontSize = `${
+            fontSize < 1 ? fontSize + 0.1 : fontSize + 1
+          }px`;
+        }
+      }
+
+      // Increase font based on width
+      if (divTextEl.clientWidth >= noteEl.clientWidth - 24) {
+        // divTextEl.style.fontSize = `clamp(8px, ${fontSize - 1}px, 64px)`;
+        while (divTextEl.clientWidth >= noteEl.clientWidth - 24) {
+          const thisfontSize = parseInt(
+            window.getComputedStyle(divTextEl).fontSize,
+            10
+          );
+          divTextEl.style.fontSize = `${
+            thisfontSize < 1 ? thisfontSize - 0.1 : thisfontSize - 1
+          }px`; //`clamp(8px, ${thisfontSize - 1}px, 64px)`;
+        }
+      }
+
+      // Increase font based on width
+      if (divTextEl.clientHeight >= noteEl.clientHeight - 24) {
+        // divTextEl.style.fontSize = `clamp(8px, ${fontSize - 1}px, 64px)`;
+        while (divTextEl.clientHeight >= noteEl.clientHeight - 24) {
+          const thisfontSize = parseInt(
+            window.getComputedStyle(divTextEl).fontSize,
+            10
+          );
+          divTextEl.style.fontSize = `${
+            thisfontSize < 1 ? thisfontSize - 0.1 : thisfontSize - 1
+          }px`; //`clamp(8px, ${thisfontSize - 1}px, 64px)`;
+        }
+      }
+    }
+  };
 
   return (
     <div
@@ -136,15 +198,14 @@ const StickyNote = (props) => {
         className="resize-note"
         onMouseDown={(event) => resizeNote(event, currentNote)}
       ></div>
-
-      <textarea
+      <div
         id={`note_text_${currentNote.id}`}
-        placeholder=""
+        className="divText"
+        contentEditable="true"
+        onKeyUp={(event) => updateNoteText(event)}
+        onBlur={(event) => updateNote(event)}
         value={currentNote.text}
-        onChange={(event) => updateNote(event)}
-        onBlur={() => updateStop()}
-        autoFocus
-      ></textarea>
+      ></div>
     </div>
   );
 };
