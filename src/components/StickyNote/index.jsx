@@ -45,9 +45,7 @@ const StickyNote = (props) => {
     const newSize = diffX < diffY ? diffX : diffY;
     currentSelectedNote.style.width = newSize + "px";
     currentSelectedNote.style.height = newSize + "px";
-
-    //console.log(`noteWidth: ${currentSelectedNote.clientWidth}; noteWidth: ${currentSelectedNote.clientWidth} newSize ${newSize}`);
-    //noteText.style.fontSize = `clamp(16px, ${newSize / 4}px, 64px)`;
+    updateNoteText(event);
   }
 
   function resizeStop(event) {
@@ -98,57 +96,37 @@ const StickyNote = (props) => {
     const divTextEl = document.getElementById(`note_text_${currentNote.id}`);
     const fontSize = parseInt(window.getComputedStyle(divTextEl).fontSize, 10);
 
-    console.log(
-      `note w x h: | ${noteEl.clientWidth} x ${noteEl.clientHeight} |`
-    );
-    console.log(
-      `textarea w x h: | ${divTextEl.clientWidth} x ${divTextEl.clientHeight} | => fontSize: ${fontSize}`
-    );
-
-    // Default & Reset font sizing
+    const maxFontSize = parseInt(noteEl.clientHeight / 6);
     if (divTextEl.textContent === "") {
       console.log("empty content; reset font");
-      divTextEl.style.fontSize = "24px";
+      divTextEl.style.fontSize = `${maxFontSize}px`;
     } else {
-      // DELETE or BACKSPACE
-      if (event.keyCode === 8 || event.keyCode === 46) {
-        if (divTextEl.clientWidth <= noteEl.clientWidth - 24) {
-          divTextEl.style.fontSize = `${
-            fontSize < 1 ? fontSize + 0.1 : fontSize + 1
-          }px`;
-        }
-        if (divTextEl.clientHeight <= noteEl.clientHeight - 24) {
-          divTextEl.style.fontSize = `${
-            fontSize < 1 ? fontSize + 0.1 : fontSize + 1
-          }px`;
-        }
-      }
-
-      // Increase font based on width
-      if (divTextEl.clientWidth >= noteEl.clientWidth - 24) {
-        // divTextEl.style.fontSize = `clamp(8px, ${fontSize - 1}px, 64px)`;
-        while (divTextEl.clientWidth >= noteEl.clientWidth - 24) {
-          const thisfontSize = parseInt(
+      if (divTextEl.clientHeight >= noteEl.clientHeight - 28) {
+        while (divTextEl.clientHeight >= noteEl.clientHeight - 28) {
+          const thisfontSizeToDec = parseInt(
             window.getComputedStyle(divTextEl).fontSize,
             10
           );
-          divTextEl.style.fontSize = `${
-            thisfontSize < 1 ? thisfontSize - 0.1 : thisfontSize - 1
-          }px`; //`clamp(8px, ${thisfontSize - 1}px, 64px)`;
+          divTextEl.style.fontSize = `clamp(0px, ${
+            thisfontSizeToDec < 1
+              ? thisfontSizeToDec - 0.1
+              : thisfontSizeToDec - 1
+          }px, ${maxFontSize}px)`;
         }
-      }
-
-      // Increase font based on width
-      if (divTextEl.clientHeight >= noteEl.clientHeight - 24) {
-        // divTextEl.style.fontSize = `clamp(8px, ${fontSize - 1}px, 64px)`;
-        while (divTextEl.clientHeight >= noteEl.clientHeight - 24) {
-          const thisfontSize = parseInt(
+      } else {
+        while (
+          divTextEl.clientHeight < noteEl.clientHeight - 28 &&
+          fontSize < maxFontSize
+        ) {
+          const thisfontSizeToInc = parseInt(
             window.getComputedStyle(divTextEl).fontSize,
             10
           );
-          divTextEl.style.fontSize = `${
-            thisfontSize < 1 ? thisfontSize - 0.1 : thisfontSize - 1
-          }px`; //`clamp(8px, ${thisfontSize - 1}px, 64px)`;
+          divTextEl.style.fontSize = `clamp(0px, ${
+            thisfontSizeToInc < 1
+              ? thisfontSizeToInc + 0.1
+              : thisfontSizeToInc + 1
+          }px, ${maxFontSize}px)`;
         }
       }
     }
@@ -202,7 +180,7 @@ const StickyNote = (props) => {
         id={`note_text_${currentNote.id}`}
         className="divText"
         contentEditable="true"
-        onKeyUp={(event) => updateNoteText(event)}
+        onKeyDown={(event) => updateNoteText(event)}
         onBlur={(event) => updateNote(event)}
         value={currentNote.text}
       ></div>

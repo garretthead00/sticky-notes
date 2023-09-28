@@ -3,7 +3,6 @@
   justify-content: center;
   align-items: center;
 
-
   position: absolute;
   top: 100px;
   left: 300px;
@@ -18,14 +17,17 @@
   cursor: pointer;
 
   .divText {
+    margin: 2px;
+    padding: 1px;
     min-width: 12px;
     width: fit-content;
-    height: fit-content;
     max-height: 100%;
+    height: fit-content;
     overflow: hidden;
     font-size: 24px;
     font-family: "Helvetica";
     outline: none;
+    line-height: 100%;
   }
 
   .close-note {
