@@ -5,6 +5,9 @@ import "./styles.scss";
 export const MENU_IDS = {
   STICKY_NOTE: "tool-bar-sticky-note",
   TEXT_AREA: "tool-bar-text-area",
+  EMOJI: "tool-bar-emoji",
+  IMAGE: "tool-bar-image",
+  DRAW: "tool-bar-draw"
 };
 
 const ToolBar = (props) => {
@@ -34,6 +37,33 @@ const ToolBar = (props) => {
           }}
         >
           <Icon.TextareaT />
+        </li>
+        <li
+          key={MENU_IDS.IMAGE}
+          id={MENU_IDS.IMAGE}
+          onClick={(event) => {
+            selectTool(event, MENU_IDS.IMAGE);
+          }}
+        >
+          <Icon.Image />
+        </li>
+        <li
+          key={MENU_IDS.EMOJI}
+          id={MENU_IDS.EMOJI}
+          onClick={(event) => {
+            selectTool(event, MENU_IDS.EMOJI);
+          }}
+        >
+          <Icon.EmojiSunglasses />
+        </li>
+        <li
+          key={MENU_IDS.DRAW}
+          id={MENU_IDS.DRAW}
+          onClick={(event) => {
+            selectTool(event, MENU_IDS.DRAW);
+          }}
+        >
+          <Icon.Brush />
         </li>
       </ul>
     </div>

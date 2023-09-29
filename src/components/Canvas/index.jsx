@@ -4,10 +4,16 @@ import "./styles.scss";
 
 // COMPONENTS
 import StickyNote from "../StickyNote";
+import TextArea from "../TextArea";
 import ToolBar, { MENU_IDS } from "../ToolBar";
 
 // REDUCERS
-import notesReducer from "../../reducers/notesReducer";
+import notesReducer, {
+  NOTES_REDUCER_ACTIONS,
+} from "../../reducers/notesReducer";
+import textAreReducer, {
+  TEXT_AREA_REDUCER_ACTIONS,
+} from "../../reducers/textAreaReducer";
 
 const initialNoteState = {
   lastNoteCreated: null,
@@ -15,9 +21,19 @@ const initialNoteState = {
   notes: [],
 };
 
+const initialTextAreaState = {
+  lastTextAreaCreated: null,
+  totalTextAreas: 0,
+  textAreas: [],
+};
+
 const Canvas = () => {
-  const [notesState, dispatch] = useReducer(notesReducer, initialNoteState);
-  const [selectedNote, setSelectedNote] = useState();
+  const [notesState, dispatchNote] = useReducer(notesReducer, initialNoteState);
+  const [textAreasState, dispatchTextArea] = useReducer(
+    textAreReducer,
+    initialTextAreaState
+  );
+  const [selectedContent, setSelectedContent] = useState();
 
   const addNote = () => {
     console.log(`adding Note...`);
@@ -26,24 +42,38 @@ const Canvas = () => {
       text: "",
       rotate: Math.floor(Math.random() * 20),
     };
-    dispatch({ type: "ADD_NOTE", payload: newNote });
+    dispatchNote({ type: NOTES_REDUCER_ACTIONS.ADD_NOTE, payload: newNote });
   };
   const deleteNote = (note) => {
-    dispatch({ type: "DELETE_NOTE", payload: note });
+    dispatchNote({ type: NOTES_REDUCER_ACTIONS.DELETE_NOTE, payload: note });
   };
   const updateNote = (note) => {
-    dispatch({ type: "UPDATE_NOTE", payload: note });
+    dispatchNote({ type: NOTES_REDUCER_ACTIONS.UPDATE_NOTE, payload: note });
   };
 
-  const selectNote = (note) => {
-    setSelectedNote(note);
+  const addTextArea = () => {
+    console.log(`adding Text Area...`);
+    const newNote = {
+      id: uuid(),
+      text: "",
+    };
+    dispatchTextArea({
+      type: TEXT_AREA_REDUCER_ACTIONS.ADD_TEXT_AREA,
+      payload: newNote,
+    });
+  };
+
+  const selectContent = (note) => {
+    setSelectedContent(note);
     console.log(`selected note with id: ${note.id}`);
   };
 
-  const dropNote = (event) => {
+  const dropContent = (event) => {
+    console.log('drop shit...');
     event.target.style.top = `${event.pageY - 50}px`;
     event.target.style.left = `${event.pageX - 50}px`;
   };
+  
 
   const dragOver = (event) => {
     event.stopPropagation();
@@ -59,6 +89,7 @@ const Canvas = () => {
         break;
       case MENU_IDS.TEXT_AREA:
         console.log(`add text area`);
+        addTextArea();
         break;
       default:
         console.log(`nothing`);
@@ -70,19 +101,27 @@ const Canvas = () => {
     <div
       className="canvas"
       onDragOver={dragOver}
-      onClick={() => setSelectedNote()}
+      onClick={() => setSelectedContent()}
     >
-      {/* <CanvasForm addNote={addNote} /> */}
       <ToolBar selectTool={selectTool} />
       {notesState.notes.map((note) => (
         <StickyNote
           key={note.id}
           note={note}
-          dropNote={dropNote}
+          dropNote={dropContent}
           deleteNote={deleteNote}
-          selectNote={selectNote}
+          selectNote={selectContent}
           updateNote={updateNote}
-          isSelected={note?.id === selectedNote?.id}
+          isSelected={note?.id === setSelectedContent?.id}
+        />
+      ))}
+      {textAreasState.textAreas.map((textArea) => (
+        <TextArea 
+          key={textArea.id}
+          dropTextArea={dropContent}
+          isSelected={textArea?.id === setSelectedContent?.id}
+          selectTextArea={selectContent}
+          textArea={textArea}
         />
       ))}
     </div>

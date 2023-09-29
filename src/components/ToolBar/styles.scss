@@ -7,11 +7,15 @@
   ul {
     padding: 0px;
     list-style-type: none;
-    // border: 1px solid black;
+    box-shadow: 0px 0px 5px gray;
+    border-radius: 10px;
   }
   li {
-    border: 1px solid gray;
+    margin: 2px;
+    padding: 2px;
+
     &:hover {
+      border-radius: 10px;
       background-color: gray;
     }
   }

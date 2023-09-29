@@ -172,10 +172,13 @@ const StickyNote = (props) => {
           />
         </svg>
       </div>
-      <div
-        className="resize-note"
-        onMouseDown={(event) => resizeNote(event, currentNote)}
-      ></div>
+      {isSelected && (
+        <div
+          className="resize-note"
+          onMouseDown={(event) => resizeNote(event, currentNote)}
+        ></div>
+      )}
+
       <div
         id={`note_text_${currentNote.id}`}
         className="divText"
