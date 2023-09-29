@@ -12,7 +12,10 @@ const notesReducer = (prevState, action) => {
     case "UPDATE_NOTE": {
       const newState = {
         ...prevState,
-        notes: [...prevState.notes.filter((note) => note.id !== action.payload.id), action.payload],
+        notes: [
+          ...prevState.notes.filter((note) => note.id !== action.payload.id),
+          action.payload,
+        ],
       };
       console.log("UPDATE_NOTE", newState);
       return newState;

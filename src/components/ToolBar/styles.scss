@@ -1,0 +1,25 @@
+.toolbar {
+  display: flex;
+  position: absolute;
+  left: 10px;
+  width: 32px;
+
+  ul {
+    padding: 0px;
+    list-style-type: none;
+    // border: 1px solid black;
+  }
+  li {
+    border: 1px solid gray;
+    &:hover {
+      background-color: gray;
+    }
+  }
+  svg {
+    width: 32px;
+    height: 32px;
+    margin: 2px;
+
+    pointer-events: none;
+  }
+}
