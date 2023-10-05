@@ -14,6 +14,7 @@ import notesReducer, {
 import textAreReducer, {
   TEXT_AREA_REDUCER_ACTIONS,
 } from "../../reducers/textAreaReducer";
+import Resizer from "../Resizer";
 
 const initialNoteState = {
   lastNoteCreated: null,
@@ -34,6 +35,9 @@ const Canvas = () => {
     initialTextAreaState
   );
   const [selectedContent, setSelectedContent] = useState();
+
+  const [resizersState, setResizers] = useState([]);
+
 
   const addNote = () => {
     console.log(`adding Note...`);
@@ -63,17 +67,21 @@ const Canvas = () => {
     });
   };
 
+  const addResizer = () => {
+    console.log(`resizers: ${resizersState.length}`);
+    setResizers([...resizersState, { id: '1'}]);
+  }
+
   const selectContent = (note) => {
     setSelectedContent(note);
     console.log(`selected note with id: ${note.id}`);
   };
 
   const dropContent = (event) => {
-    console.log('drop shit...');
+    console.log("drop shit...");
     event.target.style.top = `${event.pageY - 50}px`;
     event.target.style.left = `${event.pageX - 50}px`;
   };
-  
 
   const dragOver = (event) => {
     event.stopPropagation();
@@ -90,6 +98,10 @@ const Canvas = () => {
       case MENU_IDS.TEXT_AREA:
         console.log(`add text area`);
         addTextArea();
+        break;
+      case MENU_IDS.IMAGE:
+        console.log(`add resizer`);
+        addResizer();
         break;
       default:
         console.log(`nothing`);
@@ -116,13 +128,16 @@ const Canvas = () => {
         />
       ))}
       {textAreasState.textAreas.map((textArea) => (
-        <TextArea 
+        <TextArea
           key={textArea.id}
           dropTextArea={dropContent}
           isSelected={textArea?.id === setSelectedContent?.id}
           selectTextArea={selectContent}
           textArea={textArea}
         />
+      ))}
+      {resizersState.map((resizer) => (
+        <Resizer/>
       ))}
     </div>
   );

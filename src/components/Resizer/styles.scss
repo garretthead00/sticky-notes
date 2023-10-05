@@ -1,0 +1,97 @@
+.resizable {
+  display: block;
+  position: absolute;
+  top: 100px;
+  left: 300px;
+  background: black;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: 100px;
+  left: 100px;
+
+  .resizers {
+    width: 100%;
+    height: 100%;
+    border: 3px solid #4286f4;
+    box-sizing: border-box;
+
+    .resizer {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%; /*magic to turn square into circle*/
+      background: white;
+      border: 3px solid #4286f4;
+      position: absolute;
+    }
+  }
+
+  .rotators {
+    width: 100%;
+    height: 100%;
+    //border: 3px solid #4286f4;
+    box-sizing: border-box;
+
+    .rotator {
+      width: 20px;
+      height: 20px;
+      position: absolute;
+      cursor: grab;
+
+      svg {
+        width: 20px;
+        height: 20x;
+        margin: 0px;
+        pointer-events: none;
+        display: none;
+      }
+
+      &:hover svg {
+        display: block;
+        transform: scale(1.6);
+      }
+    }
+  }
+}
+
+.resizer.top-left {
+  left: -5px;
+  top: -5px;
+  cursor: nwse-resize; /*resizer cursor*/
+}
+.resizer.top-right {
+  right: -5px;
+  top: -5px;
+  cursor: nesw-resize;
+}
+.resizer.bottom-left {
+  left: -5px;
+  bottom: -5px;
+  cursor: nesw-resize;
+}
+.resizer.bottom-right {
+  right: -5px;
+  bottom: -5px;
+  cursor: nwse-resize;
+}
+
+.rotator.top-left {
+  left: -20px;
+  top: -20px;
+  cursor: grab;
+}
+.rotator.top-right {
+  right: -20px;
+  top: -20px;
+  cursor: grab;
+}
+.rotator.bottom-left {
+  left: -20px;
+  bottom: -20px;
+  cursor: grab;
+}
+.rotator.bottom-right {
+  right: -20px;
+  bottom: -20px;
+  cursor: grab;
+}

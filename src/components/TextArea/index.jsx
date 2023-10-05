@@ -4,11 +4,7 @@ import "./styles.scss";
 const TextArea = (props) => {
   const { textArea, isSelected } = props;
   const [currentSelection, setCurrentSelection] = useState({});
-  let clientX, clientY, currentSelectedTextArea;
-
-  // useEffect(() => {
-  //   setCurrentSelection(textArea);
-  // }, []);
+  let clientX, clientY, currentSelectedTextArea, prevWidth;
 
   useEffect(() => {
     setCurrentSelection(textArea);
@@ -18,6 +14,41 @@ const TextArea = (props) => {
     console.log("drop text area...");
     props.dropTextArea(event);
   };
+
+  const resizeTextArea = (event, textArea) => {
+    console.log(`resize textArea =>`, event.target.className);
+    event.stopPropagation();
+    event.preventDefault();
+    currentSelectedTextArea = document.getElementById(`textArea_${currentSelection.id}`);
+    prevWidth = parseInt(window.getComputedStyle(currentSelectedTextArea).width, 10);
+    window.addEventListener("mousemove", resizeStart, false);
+    window.addEventListener("mouseup", resizeStop, false);
+  }
+
+  function resizeStart(event) {
+    const diffX = event.clientX - currentSelectedTextArea.offsetLeft - prevWidth;
+    const diffX2 = Math.abs(event.clientX - currentSelectedTextArea.offsetLeft);
+    console.group('----resizing----');
+    console.log(`event.X: ${event.clientX}`);
+    console.log(`resizing to => ${diffX}px | ${diffX2}px | prevWidth: ${prevWidth}`);
+    console.groupEnd();
+    if(event.target.className.includes('resize-left')) {
+      console.log(`left newSize: ${prevWidth + diffX2 + "px"}`)
+      currentSelectedTextArea.style.width = prevWidth + diffX2 + "px";
+    } else {
+      console.log(`right newSize: ${prevWidth + diffX2 + "px"}`)
+      currentSelectedTextArea.style.width = prevWidth + diffX2 + "px";
+    }
+    
+    //updateNoteText(event);
+  }
+
+  function resizeStop(event) {
+    currentSelectedTextArea = null;
+    prevWidth = 0;
+    window.removeEventListener("mousemove", resizeStart, false);
+    window.removeEventListener("mouseup", resizeStop, false);
+  }
 
   const rotateTextArea = (event, textArea) => {
     event.stopPropagation();
@@ -82,6 +113,14 @@ const TextArea = (props) => {
           />
         </svg>
       </div>
+      <div
+        className="resize-text-area resize-left"
+        onMouseDown={(event) => resizeTextArea(event, currentSelection)}
+      ></div>
+      <div
+        className="resize-text-area resize-right"
+        onMouseDown={(event) => resizeTextArea(event, currentSelection)}
+      ></div>
       <div id={`textArea_text_${currentSelection.id}`} className="text-area-text" contentEditable="true"></div>
     </div>
   );
