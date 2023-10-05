@@ -38,9 +38,7 @@ const Canvas = () => {
 
   const [resizersState, setResizers] = useState([]);
 
-
   const addNote = () => {
-    console.log(`adding Note...`);
     const newNote = {
       id: uuid(),
       text: "",
@@ -56,7 +54,6 @@ const Canvas = () => {
   };
 
   const addTextArea = () => {
-    console.log(`adding Text Area...`);
     const newNote = {
       id: uuid(),
       text: "",
@@ -69,8 +66,8 @@ const Canvas = () => {
 
   const addResizer = () => {
     console.log(`resizers: ${resizersState.length}`);
-    setResizers([...resizersState, { id: '1'}]);
-  }
+    setResizers([...resizersState, { id: "1" }]);
+  };
 
   const selectContent = (note) => {
     setSelectedContent(note);
@@ -78,7 +75,6 @@ const Canvas = () => {
   };
 
   const dropContent = (event) => {
-    console.log("drop shit...");
     event.target.style.top = `${event.pageY - 50}px`;
     event.target.style.left = `${event.pageX - 50}px`;
   };
@@ -137,7 +133,7 @@ const Canvas = () => {
         />
       ))}
       {resizersState.map((resizer) => (
-        <Resizer/>
+        <Resizer dropItem={dropContent} />
       ))}
     </div>
   );
