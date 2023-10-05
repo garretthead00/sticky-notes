@@ -4,7 +4,7 @@ import "./styles.scss";
 const TextArea = (props) => {
   const { textArea, isSelected } = props;
   const [currentSelection, setCurrentSelection] = useState({});
-  let clientX, clientY, currentSelectedTextArea, prevWidth;
+  let clientX, clientY, currentSelectedTextArea;
 
   useEffect(() => {
     setCurrentSelection(textArea);
@@ -20,32 +20,17 @@ const TextArea = (props) => {
     event.stopPropagation();
     event.preventDefault();
     currentSelectedTextArea = document.getElementById(`textArea_${currentSelection.id}`);
-    prevWidth = parseInt(window.getComputedStyle(currentSelectedTextArea).width, 10);
     window.addEventListener("mousemove", resizeStart, false);
     window.addEventListener("mouseup", resizeStop, false);
   }
 
   function resizeStart(event) {
-    const diffX = event.clientX - currentSelectedTextArea.offsetLeft - prevWidth;
-    const diffX2 = Math.abs(event.clientX - currentSelectedTextArea.offsetLeft);
-    console.group('----resizing----');
-    console.log(`event.X: ${event.clientX}`);
-    console.log(`resizing to => ${diffX}px | ${diffX2}px | prevWidth: ${prevWidth}`);
-    console.groupEnd();
-    if(event.target.className.includes('resize-left')) {
-      console.log(`left newSize: ${prevWidth + diffX2 + "px"}`)
-      currentSelectedTextArea.style.width = prevWidth + diffX2 + "px";
-    } else {
-      console.log(`right newSize: ${prevWidth + diffX2 + "px"}`)
-      currentSelectedTextArea.style.width = prevWidth + diffX2 + "px";
-    }
-    
-    //updateNoteText(event);
+    const diffX = event.clientX - currentSelectedTextArea.offsetLeft;
+    currentSelectedTextArea.style.width = diffX + "px";
   }
 
   function resizeStop(event) {
     currentSelectedTextArea = null;
-    prevWidth = 0;
     window.removeEventListener("mousemove", resizeStart, false);
     window.removeEventListener("mouseup", resizeStop, false);
   }
