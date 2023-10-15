@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from "react";
+import React, { useReducer, useState, useEffect } from "react";
 import { v4 as uuid } from "uuid";
 import "./styles.scss";
 
@@ -6,6 +6,8 @@ import "./styles.scss";
 import StickyNote from "../StickyNote";
 import TextArea from "../TextArea";
 import ToolBar, { MENU_IDS } from "../ToolBar";
+import Resizer from "../Resizer";
+import ContentWrapper from "../ContentWrapper";
 
 // REDUCERS
 import notesReducer, {
@@ -14,7 +16,7 @@ import notesReducer, {
 import textAreReducer, {
   TEXT_AREA_REDUCER_ACTIONS,
 } from "../../reducers/textAreaReducer";
-import Resizer from "../Resizer";
+
 
 const initialNoteState = {
   lastNoteCreated: null,
@@ -34,9 +36,11 @@ const Canvas = () => {
     textAreReducer,
     initialTextAreaState
   );
-  const [selectedContent, setSelectedContent] = useState();
+  const [selectedContent, setSelectedContent] = useState("");
 
   const [resizersState, setResizers] = useState([]);
+  const [contentWrapperState, setContentWrapper] = useState([]);
+
 
   const addNote = () => {
     const newNote = {
@@ -66,12 +70,24 @@ const Canvas = () => {
 
   const addResizer = () => {
     console.log(`resizers: ${resizersState.length}`);
-    setResizers([...resizersState, { id: "1" }]);
+    setResizers([...resizersState, { id: uuid() }]);
   };
 
-  const selectContent = (note) => {
-    setSelectedContent(note);
-    console.log(`selected note with id: ${note.id}`);
+  const addContentWrapper = () => {
+    console.log(`contentWrappers: ${contentWrapperState.length}`);
+    setContentWrapper([...contentWrapperState, { id: uuid() }]);
+  };
+
+  const selectContent = (content) => {
+    if(content){
+      setSelectedContent(content);
+      console.log(`selected content with id: ${content} | current selectedContent: ${selectedContent}`);
+    }
+    else {
+      setSelectedContent("");
+      console.log(`selected content with id: ${undefined} | current selectedContent: ${selectedContent}`);
+    }
+    
   };
 
   const dropContent = (event) => {
@@ -99,6 +115,10 @@ const Canvas = () => {
         console.log(`add resizer`);
         addResizer();
         break;
+        case MENU_IDS.EMOJI:
+        console.log(`add contentWrapper`);
+        addContentWrapper();
+        break;
       default:
         console.log(`nothing`);
         break;
@@ -109,10 +129,10 @@ const Canvas = () => {
     <div
       className="canvas"
       onDragOver={dragOver}
-      onClick={() => setSelectedContent()}
+      onMouseUp={() => selectContent()}
     >
       <ToolBar selectTool={selectTool} />
-      {notesState.notes.map((note) => (
+      {/* {notesState.notes.map((note) => (
         <StickyNote
           key={note.id}
           note={note}
@@ -122,18 +142,37 @@ const Canvas = () => {
           updateNote={updateNote}
           isSelected={note?.id === setSelectedContent?.id}
         />
-      ))}
+      ))} */}
       {textAreasState.textAreas.map((textArea) => (
         <TextArea
           key={textArea.id}
           dropTextArea={dropContent}
-          isSelected={textArea?.id === setSelectedContent?.id}
+          isSelected={textArea?.id === selectedContent}
           selectTextArea={selectContent}
           textArea={textArea}
         />
       ))}
       {resizersState.map((resizer) => (
-        <Resizer dropItem={dropContent} />
+        <Resizer key={resizer.id} dropItem={dropContent} />
+      ))}
+      {notesState.notes.map((note) => (
+        <ContentWrapper
+        key={note.id}
+        isSelected={note?.id === selectedContent}
+        selectContent={selectContent}
+        contentId={note.id}
+        // id={`wrapper-${note.id}`}
+        >
+        <StickyNote
+          key={note.id}
+          note={note}
+          dropNote={dropContent}
+          deleteNote={deleteNote}
+          selectNote={selectContent}
+          updateNote={updateNote}
+          isSelected={note?.id === selectedContent}
+        />
+        </ContentWrapper>
       ))}
     </div>
   );

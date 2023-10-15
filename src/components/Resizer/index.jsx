@@ -3,14 +3,20 @@ import * as Icon from "react-bootstrap-icons";
 import "./styles.scss";
 
 const Resizer = (props) => {
-    
   const dropItem = (event) => {
     props.dropItem(event);
   };
 
-  function makeResizableDiv(event) {
-    console.log("resize...", event.target);
-    const resizerEl = document.getElementById(`resizer`);
+  const enableContent = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    makeResizable(event);
+    //makeRotatable(event);
+  };
+
+  function makeResizable(event) {
+    console.log("makeResizable...", event.target);
+    const contentWrapper = document.getElementById("contentWrapper");
     const resizers = document.querySelectorAll(".resizer");
     const minimum_size = 20;
     let original_width = 0;
@@ -24,66 +30,67 @@ const Resizer = (props) => {
       currentResizer.addEventListener("mousedown", function (e) {
         e.preventDefault();
         original_width = parseFloat(
-          getComputedStyle(resizerEl, null)
+          getComputedStyle(contentWrapper, null)
             .getPropertyValue("width")
             .replace("px", "")
         );
         original_height = parseFloat(
-          getComputedStyle(resizerEl, null)
+          getComputedStyle(contentWrapper, null)
             .getPropertyValue("height")
             .replace("px", "")
         );
-        original_x = resizerEl.getBoundingClientRect().left;
-        original_y = resizerEl.getBoundingClientRect().top;
+        original_x = contentWrapper.getBoundingClientRect().left;
+        original_y = contentWrapper.getBoundingClientRect().top;
         original_mouse_x = e.pageX;
         original_mouse_y = e.pageY;
-        window.addEventListener("mousemove", resizeStart);
-        window.addEventListener("mouseup", resizeStop);
+        window.addEventListener("mousemove", resizeStart, false);
+        window.addEventListener("mouseup", resizeStop, false);
       });
 
       function resizeStart(e) {
+        console.log("resizing start...");
         if (currentResizer.classList.contains("bottom-right")) {
           const width = original_width + (e.pageX - original_mouse_x);
           const height = original_height + (e.pageY - original_mouse_y);
           if (width > minimum_size) {
-            resizerEl.style.width = width + "px";
+            contentWrapper.style.width = width + "px";
           }
           if (height > minimum_size) {
-            resizerEl.style.height = height + "px";
+            contentWrapper.style.height = height + "px";
           }
         } else if (currentResizer.classList.contains("bottom-left")) {
           const height = original_height + (e.pageY - original_mouse_y);
           const width = original_width - (e.pageX - original_mouse_x);
           if (height > minimum_size) {
-            resizerEl.style.height = height + "px";
+            contentWrapper.style.height = height + "px";
           }
           if (width > minimum_size) {
-            resizerEl.style.width = width + "px";
-            resizerEl.style.left =
+            contentWrapper.style.width = width + "px";
+            contentWrapper.style.left =
               original_x + (e.pageX - original_mouse_x) + "px";
           }
         } else if (currentResizer.classList.contains("top-right")) {
           const width = original_width + (e.pageX - original_mouse_x);
           const height = original_height - (e.pageY - original_mouse_y);
           if (width > minimum_size) {
-            resizerEl.style.width = width + "px";
+            contentWrapper.style.width = width + "px";
           }
           if (height > minimum_size) {
-            resizerEl.style.height = height + "px";
-            resizerEl.style.top =
+            contentWrapper.style.height = height + "px";
+            contentWrapper.style.top =
               original_y + (e.pageY - original_mouse_y) + "px";
           }
         } else {
           const width = original_width - (e.pageX - original_mouse_x);
           const height = original_height - (e.pageY - original_mouse_y);
           if (width > minimum_size) {
-            resizerEl.style.width = width + "px";
-            resizerEl.style.left =
+            contentWrapper.style.width = width + "px";
+            contentWrapper.style.left =
               original_x + (e.pageX - original_mouse_x) + "px";
           }
           if (height > minimum_size) {
-            resizerEl.style.height = height + "px";
-            resizerEl.style.top =
+            contentWrapper.style.height = height + "px";
+            contentWrapper.style.top =
               original_y + (e.pageY - original_mouse_y) + "px";
           }
         }
@@ -91,18 +98,48 @@ const Resizer = (props) => {
 
       function resizeStop() {
         console.log("resizing stop...");
-        window.removeEventListener("mousemove", resizeStart);
+        window.removeEventListener("mousemove", resizeStart, false);
+        window.removeEventListener("mouseup", resizeStop, false);
       }
+    }
+  }
+
+  function makeRotatable(event) {
+    console.log("makeRotatable...", event.target);
+    event.stopPropagation();
+    event.preventDefault();
+    const contentWrapper = document.getElementById("contentWrapper");
+    const rectBounds = contentWrapper.getBoundingClientRect();
+
+    window.addEventListener("mousemove", rotateStart, false);
+    window.addEventListener("mouseup", rotateStop, false);
+
+    function rotateStart(event) {
+      console.log("rotating start...");
+      var centerX = rectBounds.left + rectBounds.width / 2;
+      var centerY = rectBounds.top + rectBounds.height / 2;
+      var radians = Math.atan2(
+        event.clientY - centerY,
+        event.clientX - centerX
+      );
+      var degree = radians * (180 / Math.PI) + 90;
+      contentWrapper.style.transform = "rotate(" + degree + "deg)";
+    }
+
+    function rotateStop() {
+      console.log("rotating stop...");
+      window.removeEventListener("mousemove", rotateStart, false);
+      window.removeEventListener("mouseup", rotateStop, false);
     }
   }
 
   return (
     <div
-      id="resizer"
+      id="contentWrapper"
       className="resizable"
       draggable="true"
       onDragEnd={dropItem}
-      onClick={(event) => makeResizableDiv(event)}
+      onClick={(event) => enableContent(event)}
     >
       <div className="resizers">
         <div className="resizer top-left"></div>
@@ -110,19 +147,8 @@ const Resizer = (props) => {
         <div className="resizer bottom-left"></div>
         <div className="resizer bottom-right"></div>
       </div>
-      <div className="rotators">
-        <div className="rotator top-left">
-          <Icon.ArrowRepeat />
-        </div>
-        <div className="rotator top-right">
-          <Icon.ArrowRepeat />
-        </div>
-        <div className="rotator bottom-left">
-          <Icon.ArrowRepeat />
-        </div>
-        <div className="rotator bottom-right">
-          <Icon.ArrowRepeat />
-        </div>
+      <div className="rotator" onMouseDown={(event) => makeRotatable(event)}>
+        <Icon.ArrowRepeat />
       </div>
     </div>
   );
